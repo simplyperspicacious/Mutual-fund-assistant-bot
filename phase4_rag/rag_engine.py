@@ -29,7 +29,7 @@ INDEX_PATH = os.path.join(FAISS_DB_DIR, "ppfas_index.faiss")
 METADATA_PATH = os.path.join(FAISS_DB_DIR, "ppfas_metadata.pkl")
 
 # Load environment variables (for GEMINI_API_KEY)
-load_dotenv()
+load_dotenv(override=True)
 
 
 class RAGEngine:
