@@ -20,5 +20,4 @@ ENV/
 .idea/
 
 # Large Model / Data Files
-phase2_indexing/faiss_db/
 phase1_ingestion/data/raw/
