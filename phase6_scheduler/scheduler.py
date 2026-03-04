@@ -4,9 +4,15 @@ import sys
 import time
 from datetime import datetime
 
-# Windows terminal UTF-8 encoding fix for emojis
-sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')  # type: ignore
+except Exception:
+    pass
+
+try:
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')  # type: ignore
+except Exception:
+    pass
 
 # Add the project root to the path so we can import from phases
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
