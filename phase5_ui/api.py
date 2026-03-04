@@ -30,8 +30,11 @@ app.add_middleware(
 print("Initializing RAG Engine on server start...")
 try:
     rag = RAGEngine()
+    print("RAG Engine successfully initialized.")
 except Exception as e:
-    print(f"Failed to initialize RAG Engine: {e}")
+    print(f"CRITICAL: Failed to initialize RAG Engine: {e}")
+    import traceback
+    traceback.print_exc()
     rag = None
 
 class ChatRequest(BaseModel):
@@ -70,6 +73,8 @@ app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
-    # Run dev server
-    print("Starting server. To view frontend, visit: http://127.0.0.1:8000")
-    uvicorn.run("api:app", host="127.0.0.1", port=8000, reload=True)
+    # Get port from environment variable for deployment (Render/Heroku)
+    port = int(os.environ.get("PORT", 8000))
+    # In production, bind to 0.0.0.0
+    print(f"Starting server on port {port}. To view frontend, visit: http://0.0.0.0:{port}")
+    uvicorn.run("api:app", host="0.0.0.0", port=port, reload=False)
