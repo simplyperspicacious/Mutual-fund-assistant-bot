@@ -12,7 +12,7 @@
         "riskometer_category": "Very High",
         "benchmark_index": "NIFTY 500 Total Return Index",
         "source_url": "https://groww.in/mutual-funds/parag-parikh-long-term-value-fund-direct-growth",
-        "last_updated": "2026-03-04T11:22:27.438010"
+        "last_updated": "2026-03-04T17:30:03.593266+05:30"
     },
     {
         "scheme_id": "parag-parikh-elss-tax-saver-fund-direct-growth",
@@ -27,7 +27,7 @@
         "riskometer_category": "Moderately High",
         "benchmark_index": "NIFTY 500 Total Return Index",
         "source_url": "https://groww.in/mutual-funds/parag-parikh-elss-tax-saver-fund-direct-growth",
-        "last_updated": "2026-03-04T11:22:32.628221"
+        "last_updated": "2026-03-04T17:30:09.830152+05:30"
     },
     {
         "scheme_id": "parag-parikh-conservative-hybrid-fund-direct-growth",
@@ -42,7 +42,7 @@
         "riskometer_category": "Moderately High",
         "benchmark_index": "CRISIL Hybrid 85+15 Conservative Index",
         "source_url": "https://groww.in/mutual-funds/parag-parikh-conservative-hybrid-fund-direct-growth",
-        "last_updated": "2026-03-04T11:22:37.363958"
+        "last_updated": "2026-03-04T17:30:17.714091+05:30"
     },
     {
         "scheme_id": "parag-parikh-liquid-fund-direct-growth",
@@ -57,7 +57,7 @@
         "riskometer_category": "Moderate",
         "benchmark_index": "CRISIL Liquid Debt A-I Index",
         "source_url": "https://groww.in/mutual-funds/parag-parikh-liquid-fund-direct-growth",
-        "last_updated": "2026-03-04T11:22:42.269820"
+        "last_updated": "2026-03-04T17:30:24.823180+05:30"
     },
     {
         "scheme_id": "parag-parikh-arbitrage-fund-direct-growth",
@@ -72,7 +72,7 @@
         "riskometer_category": "Low",
         "benchmark_index": "NIFTY 50 Arbitrage Total Return Index",
         "source_url": "https://groww.in/mutual-funds/parag-parikh-arbitrage-fund-direct-growth",
-        "last_updated": "2026-03-04T11:22:47.417746"
+        "last_updated": "2026-03-04T17:30:32.073321+05:30"
     },
     {
         "scheme_id": "parag-parikh-dynamic-asset-allocation-fund-direct-growth",
@@ -87,7 +87,7 @@
         "riskometer_category": "Moderate",
         "benchmark_index": "CRISIL Hybrid 50+50 Moderate Index",
         "source_url": "https://groww.in/mutual-funds/parag-parikh-dynamic-asset-allocation-fund-direct-growth",
-        "last_updated": "2026-03-04T11:22:52.088736"
+        "last_updated": "2026-03-04T17:30:39.500640+05:30"
     },
     {
         "scheme_id": "parag-parikh-large-cap-fund-direct-growth",
@@ -102,6 +102,6 @@
         "riskometer_category": "Very High",
         "benchmark_index": "NIFTY 100 Total Return Index",
         "source_url": "https://groww.in/mutual-funds/parag-parikh-large-cap-fund-direct-growth",
-        "last_updated": "2026-03-04T11:22:56.793103"
+        "last_updated": "2026-03-04T17:30:46.624822+05:30"
     }
 ]

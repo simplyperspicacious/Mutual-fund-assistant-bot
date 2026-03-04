@@ -1,7 +1,12 @@
 # pyre-ignore-all-errors
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 # Trigger Pyright refresh
 from pydantic import BaseModel, Field  # type: ignore
+
+def get_ist_time() -> str:
+    """Return the current time explicitly encoded as Indian Standard Time (IST)."""
+    ist_offset = timezone(timedelta(hours=5, minutes=30))
+    return datetime.now(ist_offset).isoformat()
 
 class SchemeData(BaseModel):
     scheme_id: str = Field(..., description="Slug derived from the URL")
@@ -19,4 +24,4 @@ class SchemeData(BaseModel):
     benchmark_index: str = Field(..., description="Official benchmark index")
     
     source_url: str = Field(..., description="Canonical scheme URL")
-    last_updated: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    last_updated: str = Field(default_factory=get_ist_time)
