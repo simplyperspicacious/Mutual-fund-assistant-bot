@@ -30,8 +30,11 @@ app.add_middleware(
 print("Initializing RAG Engine on server start...")
 try:
     rag = RAGEngine()
+    print("RAG Engine successfully initialized.")
 except Exception as e:
-    print(f"Failed to initialize RAG Engine: {e}")
+    print(f"CRITICAL: Failed to initialize RAG Engine: {e}")
+    import traceback
+    traceback.print_exc()
     rag = None
 
 class ChatRequest(BaseModel):

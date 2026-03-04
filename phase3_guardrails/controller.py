@@ -22,17 +22,17 @@ class QueryGuardrail:
     # Heuristics for advisory intent
     ADVISORY_PATTERNS = [
         r"\bshould i invest\b",
-        r"\bis this a good\b",
-        r"\bwill i make money\b",
+        r"\bis (this|it) a good\b",
         r"\bgive me advice\b",
         r"\bwhich fund is best\b",
-        r"\bbetter to invest in\b",
-        r"\brecommend.*fund\b",
-        r"\bwhat should i buy\b",
-        r"\bwhere to put my money\b",
+        r"\brecommend.*funds?\b",
+        r"\bsuggest.*funds?\b",
         r"\bsuggest me\b",
+        r"\bwhat should i buy\b",
+        r"\bwhere to (put|invest) my money\b",
         r"\bportfolio review\b",
         r"\bhighest return\b",
+        r"\bfor me\b",
     ]
 
     @classmethod
