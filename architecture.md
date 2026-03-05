@@ -18,18 +18,18 @@ The assistant answers facts such as expense ratio, exit load, minimum SIP, lock-
 ### Success Metrics (Portfolio Highlights)
 * **Response Accuracy**: 95%+ precision on factual questions utilizing retrieved context.
 * **Guardrail Reliability**: 100% rejection rate against explicitly injected PII / financial advice queries.
-* **Cost Efficiency**: $0.00 Operating Cost (utilizing Google Gemini's generous free-tier APIs and open-source tooling like ChromaDB).
+* **Cost Efficiency**: $0.00 Operating Cost (utilizing Google Gemini's generous free-tier APIs and open-source tooling like FAISS).
 
 ---
 
 ## High-level RAG flow (Target End State)
 
 * **Ingest**: Crawl official Groww AMC/scheme pages → Extract structured fund attributes → Store JSON records.
-* **Index**: Create atomic chunks → Embed using local open-source models → Index in ChromaDB.
+* **Index**: Create atomic chunks → Embed using local open-source models → Index in FAISS (with Pickle for metadata).
 * **Retrieve**: User query → Guardrails (PII + Advisory detection) → Embed query → Similarity search → Top-k factual chunks.
 * **Generate**: Query + Retrieved chunks → Constrained Gemini Prompt → Answer (≤3 sentences).
 * **Cite**: Backend appends exactly one official Groww source URL and "Last updated from sources: \<link\>".
-* **Deliver**: Streamlit Frontend → FastAPI Backend → Google Gemini API.
+* **Deliver**: Vanilla HTML/JS Frontend → FastAPI Backend → Google Gemini API.
 * **Scheduler**: Periodically re-runs ingest → re-index so the assistant reflects the latest data.
 
 ---
@@ -65,7 +65,7 @@ To support factual queries, the ingestion must capture at minimum:
 ### 1.3 Technical approach for Phase 1
 **Stack**: `Playwright` Headless Browser (for client-rendered React pages).
 * **Crawl**: Seed URLs & save raw HTML snapshots in `data/raw/`.
-* **Parse**: Parse with Playwright locators/BeautifulSoup.
+* **Parse**: Parse with Playwright locators/JavaScript injection and BeautifulSoup.
 * **Validate**: Fail ingestion if mandatory fields (`scheme_id`, `expense_ratio`, etc.) sit empty.
 * **Export**: Output as standard `data/structured/ppfas_schemes.json`. Idempotent writes.
 
@@ -84,7 +84,7 @@ Use local open-source embeddings: `sentence-transformers/all-MiniLM-L6-v2`
 **Reason**: Free, lightweight, lightning-fast for offline FAQ semantic retrieval natively within Python.
 
 ### 2.3 Vector store
-Use **ChromaDB** running locally in persistent mode. Indexing script reads structured JSON, applies the local embedding model, and pushes embedded chunks into the database with attached metadata (`scheme_id`, `field_type`, `source_url`).
+Use **FAISS** (Facebook AI Similarity Search) running locally as the vector index. The indexing script reads structured JSON, applies the local embedding model, and pushes embedded chunks into the FAISS index (`IndexFlatIP`). Since FAISS only stores numerical vectors, a parallel array containing the source text and metadata (`scheme_id`, `field_type`, `source_url`, `last_updated`) is stored in a `Pickle` database locally.
 
 ---
 
@@ -103,11 +103,11 @@ Use **ChromaDB** running locally in persistent mode. Indexing script reads struc
 **Goal**: Answer strictly using retrieved context combined with a powerful free LLM tier.
 
 ### 4.1 Retrieval flow
-1. User question → embed → top-k similarity search (k=3) in ChromaDB.
+1. User question → embed → top-k similarity search (k=3) in FAISS.
 2. Select the best matching factual semantic chunk context.
 
 ### 4.2 LLM generation (Google Gemini API)
-**Model**: `Google Gemini API` (`gemini-2.5-flash` using `google-genai` Python library).
+**Model**: `Google Gemini API` (`gemini-2.5-flash` with fallbacks to `gemini-2.0-flash` and `gemini-2.5-flash-lite`, using the `google-genai` Python library).
 **System prompt constraints**:
 *"You are a mutual fund facts assistant. Use ONLY the provided context. Answer in maximum 3 sentences. Do not provide advice. If the information is not present, clearly state that it is not available in the official source."*
 
@@ -119,31 +119,25 @@ The Gemini API handles natural language generation only.
 
 ---
 
-## Phase 5: Backend API Layer
+## Phase 5: Backend API & Frontend UI Layer (`phase5_ui`)
 
-**Goal**: Provide a clean, robust, reusable API.
-**Stack**: `FastAPI` + `Uvicorn` (Python 3.12).
-* `POST /query`: Accepts JSON question payload, routes through guardrails → ChromaDB → Gemini API → Response logic.
-* `GET /health`: Displays Vector DB status, last ingestion timestamp.
+**Goal**: Provide a robust API and a transparent Product FAQ interface in one cohesive module.
+**Backend Stack**: `FastAPI` + `Uvicorn` (Python 3.12).
+* `POST /api/chat`: Accepts JSON question payload, routes through guardrails → FAISS → Gemini API → Response logic.
 
----
-
-## Phase 6: Frontend (Minimal UI)
-
-**Goal**: Deliver a transparent Product FAQ interface.
-**Stack**: `Streamlit`.
+**Frontend Stack**: `Vanilla HTML, CSS, JavaScript` served statically via FastAPI from the `/static` directory.
 * **Welcome Message**: Outlines AI limits and strictly factual nature.
 * **Buttons**: 3 click-to-query examples (e.g., "What is the exit load of the Liquid Fund?").
 * **Chat Logic**: Displays generation wrapped beautifully with exact hyperlink citations at the end of every message.
 
 ---
 
-## Phase 7: Scheduler (Data Refresh Pipeline)
-* **Trigger**: Scheduled cron job logic to maintain freshness.
-* **Flow**: Runs Phase 1 ingestion → Re-indexes Vector Database atomically → Validates health.
+## Phase 6: Scheduler (`phase6_scheduler`)
+* **Trigger**: A standalone pure Python `subprocess` script orchestrates the pipeline sequentially on an as-needed basis.
+* **Flow**: Runs Phase 1 ingestion → Verifies with Pytest → Re-indexes FAISS atomically → Runs suite of regression tests (API, Indexer, Guardrails).
 
 ---
 
-## Phase 8: Operational Guardrails & Constraints Summary
+## Operational Guardrails & Constraints Summary
 * **Hard Limitations**: Public Groww pages only. No screenshots, no third-party blogs. No user PII storage under any circumstances.
 * **Formatting Limits**: Maximum 3 sentences per output, guaranteed appending of precisely one verified source anchor link.
