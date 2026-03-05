@@ -1,0 +1,58 @@
+name: Data Refresh Scheduler
+
+on:
+  schedule:
+    # Run at 00:00 UTC (5:30 AM IST) every day
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
+
+jobs:
+  refresh-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Required for stefanzweifel/git-auto-commit-action
+          fetch-depth: 0
+          
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip' # cache pip dependencies for faster runs
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Install Playwright Browsers
+        run: playwright install chromium
+        
+      - name: Run Scheduler Pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python phase6_scheduler/scheduler.py
+          
+      - name: Commit locally changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: Auto-refresh scraped data and FAISS index"
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          # We only want to commit data files that changed during the run
+          file_pattern: 'data/raw/*.html data/structured/*.json data/vector_store/*.index data/vector_store/*.pkl'
+
+      - name: Trigger Render Deploy
+        if: success() # Only trigger deploy if everything above (including tests in scheduler.py) succeeded
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "WARNING: RENDER_DEPLOY_HOOK_URL secret is not set. Skipping deploy trigger."
+          else
+            echo "Triggering Render deployment..."
+            curl -X POST "$DEPLOY_HOOK_URL"
+          fi
