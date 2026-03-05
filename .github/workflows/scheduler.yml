@@ -43,7 +43,7 @@ jobs:
           commit_message: "chore: Auto-refresh scraped data and FAISS index"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
           # We only want to commit data files that changed during the run
-          file_pattern: 'data/raw/*.html data/structured/*.json data/vector_store/*.index data/vector_store/*.pkl'
+          file_pattern: 'phase1_ingestion/data/raw/*.html phase1_ingestion/data/structured/*.json phase2_indexing/data/vector_store/*.index phase2_indexing/data/vector_store/*.pkl'
 
       - name: Trigger Render Deploy
         if: success() # Only trigger deploy if everything above (including tests in scheduler.py) succeeded
